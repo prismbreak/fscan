@@ -1,0 +1,86 @@
+name: 🔌 新插件/协议支持
+description: 请求支持新的服务、协议或漏洞检测
+title: "[Plugin] "
+labels: ["plugin", "enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您的插件请求！fscan 持续扩展对各种服务和协议的支持。
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 请求类型
+      options:
+        - 新服务/协议支持 (New Service)
+        - 新弱口令检测 (New Brute Force)
+        - 新漏洞 POC (New POC)
+        - 新指纹识别 (New Fingerprint)
+    validations:
+      required: true
+
+  - type: input
+    id: service
+    attributes:
+      label: 服务/协议名称
+      placeholder: "如: Kafka, ClickHouse, etcd, Consul"
+    validations:
+      required: true
+
+  - type: input
+    id: port
+    attributes:
+      label: 默认端口
+      placeholder: "如: 9092, 8123, 2379"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 服务描述
+      description: 简要介绍这个服务/协议
+      placeholder: |
+        这是一个用于 xxx 的服务...
+        在内网环境中常见于...
+    validations:
+      required: true
+
+  - type: textarea
+    id: detection
+    attributes:
+      label: 识别方法
+      description: 如何识别/检测这个服务（如有了解）
+      placeholder: |
+        Banner 特征: xxx
+        默认响应: xxx
+        认证方式: xxx
+
+  - type: textarea
+    id: reference
+    attributes:
+      label: 参考资料
+      description: 相关文档、其他工具实现、漏洞详情等
+      placeholder: |
+        - 官方文档: https://...
+        - 其他工具实现: https://...
+        - CVE编号: CVE-xxxx-xxxx
+
+  - type: dropdown
+    id: prevalence
+    attributes:
+      label: 使用普遍程度
+      description: 这个服务在目标环境中的常见程度
+      options:
+        - 非常常见 (企业环境标配)
+        - 较为常见 (经常遇到)
+        - 偶尔遇到
+        - 较少见但重要
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: 贡献意愿
+      options:
+        - label: 我愿意尝试实现这个插件并提交 PR
+        - label: 我可以提供测试环境

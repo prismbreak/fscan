@@ -1,0 +1,94 @@
+name: 🎯 误报/漏报
+description: 报告扫描结果不准确的问题
+title: "[Accuracy] "
+labels: ["accuracy"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您帮助提高 fscan 的准确性！误报和漏报都是需要优化的问题。
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 问题类型
+      options:
+        - 误报 (False Positive) - 报告了不存在的问题
+        - 漏报 (False Negative) - 未能检测到存在的问题
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: 涉及功能
+      options:
+        - 主机存活检测
+        - 端口状态判断
+        - 服务识别
+        - 弱口令检测
+        - POC/漏洞检测
+        - Web指纹识别
+        - 其他
+    validations:
+      required: true
+
+  - type: textarea
+    id: fscan-output
+    attributes:
+      label: fscan 输出结果
+      description: 粘贴相关的扫描输出（请脱敏敏感信息如真实IP、密码等）
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: 实际情况
+      description: 描述目标的真实状态
+      placeholder: |
+        实际上这个端口是关闭的 / 服务版本是 xxx / 密码不是 xxx...
+        验证方式: 通过 nmap/手动连接/其他工具 确认...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 目标环境
+      description: 描述目标的环境信息（请脱敏）
+      placeholder: |
+        - 目标系统: Windows Server 2019 / Ubuntu 22.04
+        - 服务版本: MySQL 8.0 / Redis 7.0
+        - 网络环境: 直连 / 通过代理 / VPN
+    validations:
+      required: true
+
+  - type: textarea
+    id: command
+    attributes:
+      label: 使用的命令
+      description: 执行的 fscan 命令
+      placeholder: "fscan -h x.x.x.x -p 1-65535 -pwdf pass.txt"
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: fscan 版本
+      placeholder: "如: 1.8.4"
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: 改进建议
+      description: 如果您有改进的想法，请分享
+      placeholder: |
+        建议增加 xxx 判断条件...
+        或者调整 xxx 检测逻辑...

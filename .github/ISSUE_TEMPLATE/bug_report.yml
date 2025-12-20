@@ -1,0 +1,90 @@
+name: 🐛 Bug 报告
+description: 报告扫描异常、崩溃或错误行为
+title: "[Bug] "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您提交 Bug 报告！请尽可能详细地填写以下信息，这将帮助我们更快定位和修复问题。
+
+  - type: dropdown
+    id: module
+    attributes:
+      label: 问题模块
+      description: 问题出现在哪个功能模块？
+      options:
+        - 端口扫描 (Port Scan)
+        - 主机存活检测 (Host Discovery)
+        - 服务识别 (Service Detection)
+        - 弱口令爆破 (Brute Force)
+        - POC/漏洞扫描 (POC Scan)
+        - Web指纹识别 (Web Fingerprint)
+        - 输出/日志 (Output/Logging)
+        - 命令行参数 (CLI Arguments)
+        - 其他 (Other)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: 严重程度
+      options:
+        - 崩溃/无法使用 (Crash)
+        - 功能异常 (Malfunction)
+        - 结果不准确 (Inaccurate)
+        - 性能问题 (Performance)
+        - 其他 (Other)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: 问题描述
+      description: 清晰描述遇到的问题
+      placeholder: |
+        发生了什么？
+        预期的行为是什么？
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 复现步骤
+      description: 提供可以复现问题的命令或步骤
+      placeholder: |
+        1. 执行命令: fscan -h xxx -p xxx
+        2. 观察到...
+      render: shell
+    validations:
+      required: true
+
+  - type: textarea
+    id: output
+    attributes:
+      label: 错误输出
+      description: 粘贴相关的错误信息或日志（请脱敏敏感信息）
+      render: shell
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 环境信息
+      description: 请提供运行环境信息
+      value: |
+        - fscan 版本: [如 1.8.4]
+        - 操作系统: [如 Windows 11 / Ubuntu 22.04 / macOS 14]
+        - 架构: [如 amd64 / arm64]
+        - Go 版本 (如自编译): [如 go1.20.10]
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 补充信息
+      description: 其他可能有助于排查问题的信息
