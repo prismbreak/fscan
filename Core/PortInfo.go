@@ -1,6 +1,7 @@
 package Core
 
 import (
+	"bytes"
 	"fmt"
 	"github.com/shadow1ng/fscan/Common"
 	"io"
@@ -20,10 +21,10 @@ type ServiceInfo struct {
 // Result 定义单次探测的结果
 type Result struct {
 	Service Service           // 识别出的服务信息
-	Banner  string           // 服务横幅
+	Banner  string            // 服务横幅
 	Extras  map[string]string // 额外信息
-	Send    []byte           // 发送的探测数据
-	Recv    []byte           // 接收到的响应数据
+	Send    []byte            // 发送的探测数据
+	Recv    []byte            // 接收到的响应数据
 }
 
 // Service 定义服务的基本信息
@@ -34,20 +35,20 @@ type Service struct {
 
 // Info 定义单个端口探测的上下文信息
 type Info struct {
-	Address string    // 目标IP地址
-	Port    int       // 目标端口
-	Conn    net.Conn  // 网络连接
-	Result  Result    // 探测结果
-	Found   bool      // 是否成功识别服务
+	Address string   // 目标IP地址
+	Port    int      // 目标端口
+	Conn    net.Conn // 网络连接
+	Result  Result   // 探测结果
+	Found   bool     // 是否成功识别服务
 }
 
 // PortInfoScanner 定义端口服务识别器
 type PortInfoScanner struct {
 	Address string        // 目标IP地址
-	Port    int          // 目标端口
-	Conn    net.Conn     // 网络连接
+	Port    int           // 目标端口
+	Conn    net.Conn      // 网络连接
 	Timeout time.Duration // 超时时间
-	info    *Info        // 探测上下文
+	info    *Info         // 探测上下文
 }
 
 // 预定义的基础探测器
@@ -60,7 +61,7 @@ var (
 func NewPortInfoScanner(addr string, port int, conn net.Conn, timeout time.Duration) *PortInfoScanner {
 	return &PortInfoScanner{
 		Address: addr,
-		Port:    port, 
+		Port:    port,
 		Conn:    conn,
 		Timeout: timeout,
 		info: &Info{
@@ -113,6 +114,12 @@ func (i *Info) PortInfo() {
 		Common.LogDebug(fmt.Sprintf("读取初始响应失败: %v", err))
 	}
 
+	// 1.5 JDWP handshake 指纹识别
+	if i.tryJDWPHandshake() {
+		Common.LogDebug("JDWP handshake 匹配成功")
+		return
+	}
+
 	// 记录已使用的探测器,避免重复使用
 	usedProbes := make(map[string]struct{})
 
@@ -139,6 +146,29 @@ func (i *Info) PortInfo() {
 	}
 }
 
+const jdwpHandshake = "JDWP-Handshake"
+
+func (i *Info) tryJDWPHandshake() bool {
+	Common.LogDebug("尝试 JDWP handshake 探测")
+	response := i.Connect([]byte(jdwpHandshake))
+	if len(response) == 0 {
+		return false
+	}
+
+	if !bytes.HasPrefix(response, []byte(jdwpHandshake)) {
+		return false
+	}
+
+	result := &i.Result
+	result.Service.Name = "jdwp"
+	result.Banner = trimBanner(response)
+	if result.Service.Extras == nil {
+		result.Service.Extras = make(map[string]string)
+	}
+	i.Found = true
+	return true
+}
+
 // tryProbes 尝试使用指定的探测器列表检查响应
 func (i *Info) tryProbes(response []byte, probes []*Probe) bool {
 	for _, probe := range probes {
@@ -163,7 +193,7 @@ func (i *Info) processPortMapProbes(usedProbes map[string]struct{}) bool {
 	// 遍历端口专用探测器
 	for _, name := range Common.PortMap[i.Port] {
 		Common.LogDebug(fmt.Sprintf("尝试端口专用探测器: %s", name))
-		usedProbes[name] = struct{}{} 
+		usedProbes[name] = struct{}{}
 		probe := v.ProbesMapKName[name]
 
 		// 解码探测数据
