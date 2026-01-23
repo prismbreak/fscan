@@ -97,6 +97,11 @@ func (s *PortInfoScanner) Identify() (*ServiceInfo, error) {
 	return serviceInfo, nil
 }
 
+// DetectJDWP 单独执行 JDWP handshake 探测
+func (s *PortInfoScanner) DetectJDWP() bool {
+	return s.info.tryJDWPHandshake()
+}
+
 // PortInfo 执行端口服务识别的主要逻辑
 func (i *Info) PortInfo() {
 	// 1. 首先尝试读取服务的初始响应
